@@ -23,6 +23,14 @@ import { createEdenTanStackQuery } from "../../src"
 
 const app = new Elysia()
 	.get("/hello", () => ({ message: "Hello from Elysia!" }))
+	.get("/live/numbers", () => {
+		const stream = async function* () {
+			yield 1
+			yield 2
+			yield 3
+		}
+		return stream()
+	})
 	.get("/users", () => [
 		{ id: "1", name: "Alice" },
 		{ id: "2", name: "Bob" },
@@ -65,12 +73,25 @@ const { EdenProvider, useEden } = createEdenTanStackQuery<App>()
 // ============================================================================
 
 function createMockClient() {
+	const createNumberStream = async function* () {
+		yield 1
+		yield 2
+		yield 3
+	}
 	const mockClient = {
 		hello: {
 			get: async () => ({
 				data: { message: "Hello from Elysia!" },
 				error: null,
 			}),
+		},
+		live: {
+			numbers: {
+				get: async () => ({
+					data: createNumberStream(),
+					error: null,
+				}),
+			},
 		},
 		users: Object.assign(
 			// Callable for path params: eden.users({ id: '1' })
@@ -175,6 +196,42 @@ describe("useQuery integration", () => {
 				{ id: "1", name: "Alice" },
 				{ id: "2", name: "Bob" },
 			])
+		})
+
+		test("useQuery with eden.live.numbers.get.streamedOptions()", async () => {
+			const { Wrapper } = createWrapper()
+
+			const { result } = renderHook(
+				() => {
+					const eden = useEden()
+					return useQuery(eden.live.numbers.get.streamedOptions())
+				},
+				{ wrapper: Wrapper },
+			)
+
+			await waitFor(() => {
+				expect(result.current.isSuccess).toBe(true)
+			})
+
+			expect(result.current.data).toEqual([1, 2, 3])
+		})
+
+		test("useQuery with eden.live.numbers.get.liveOptions()", async () => {
+			const { Wrapper } = createWrapper()
+
+			const { result } = renderHook(
+				() => {
+					const eden = useEden()
+					return useQuery(eden.live.numbers.get.liveOptions())
+				},
+				{ wrapper: Wrapper },
+			)
+
+			await waitFor(() => {
+				expect(result.current.isSuccess).toBe(true)
+			})
+
+			expect(result.current.data).toBe(3)
 		})
 	})
 

@@ -560,6 +560,30 @@ export interface DecorateQueryProcedure<TDef extends RouteDefinition>
 		>,
 		"queryKey"
 	>
+
+	/**
+	 * Create query options for streaming routes.
+	 * Resolves to a list of streamed items.
+	 */
+	streamedOptions: EdenQueryOptions<{
+		input: TDef["input"]
+		output: TDef["output"] extends AsyncIterable<infer TItem>
+			? TItem[]
+			: never[]
+		error: TDef["error"]
+	}>
+
+	/**
+	 * Create query options for live routes.
+	 * Resolves to only the latest streamed item.
+	 */
+	liveOptions: EdenQueryOptions<{
+		input: TDef["input"]
+		output: TDef["output"] extends AsyncIterable<infer TItem>
+			? TItem | undefined
+			: never
+		error: TDef["error"]
+	}>
 }
 
 /**
