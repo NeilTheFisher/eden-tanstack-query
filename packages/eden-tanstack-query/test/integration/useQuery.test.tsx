@@ -12,7 +12,7 @@ import {
 	useQuery,
 } from "@tanstack/react-query"
 import { renderHook, waitFor } from "@testing-library/react"
-import { Elysia, t } from "elysia"
+import { Elysia, sse, t } from "elysia"
 import type { ReactNode } from "react"
 
 import { createEdenTanStackQuery } from "../../src"
@@ -25,9 +25,9 @@ const app = new Elysia()
 	.get("/hello", () => ({ message: "Hello from Elysia!" }))
 	.get("/live/numbers", () => {
 		const stream = async function* () {
-			yield 1
-			yield 2
-			yield 3
+			yield sse("1")
+			yield sse("2")
+			yield sse("3")
 		}
 		return stream()
 	})
@@ -74,9 +74,9 @@ const { EdenProvider, useEden } = createEdenTanStackQuery<App>()
 
 function createMockClient() {
 	const createNumberStream = async function* () {
-		yield 1
-		yield 2
-		yield 3
+		yield "1"
+		yield "2"
+		yield "3"
 	}
 	const mockClient = {
 		hello: {
@@ -213,7 +213,7 @@ describe("useQuery integration", () => {
 				expect(result.current.isSuccess).toBe(true)
 			})
 
-			expect(result.current.data).toEqual([1, 2, 3])
+			expect(result.current.data).toEqual(["1", "2", "3"])
 		})
 
 		test("useQuery with eden.live.numbers.get.liveOptions()", async () => {
@@ -231,7 +231,7 @@ describe("useQuery integration", () => {
 				expect(result.current.isSuccess).toBe(true)
 			})
 
-			expect(result.current.data).toBe(3)
+			expect(result.current.data).toBe("3")
 		})
 	})
 

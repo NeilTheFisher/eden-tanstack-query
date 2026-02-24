@@ -1,5 +1,5 @@
 import type { treaty } from "@elysiajs/eden"
-import { Elysia, t } from "elysia"
+import { Elysia, sse, t } from "elysia"
 import { createEdenOptionsProxy } from "../../src/proxy/createOptionsProxy"
 import { createTestQueryClient } from "../../test-utils"
 
@@ -9,6 +9,14 @@ import { createTestQueryClient } from "../../test-utils"
 
 const app = new Elysia()
 	.get("/api/hello", () => "world")
+	.get("/api/live/numbers", () => {
+		const stream = async function* () {
+			yield sse("1")
+			yield sse("2")
+			yield sse("3")
+		}
+		return stream()
+	})
 	.get(
 		"/api/users",
 		({ query }) => {
@@ -101,9 +109,9 @@ describe("createEdenOptionsProxy", () => {
 	function createMockTreatyClient() {
 		const usersById: Record<string, unknown> = {}
 		const createNumberStream = async function* () {
-			yield 1
-			yield 2
-			yield 3
+			yield "1"
+			yield "2"
+			yield "3"
 		}
 
 		const mockClient = {
@@ -406,20 +414,18 @@ describe("createEdenOptionsProxy", () => {
 
 		test("streamedOptions collects async iterable into a list", async () => {
 			const eden = createEden()
-			// biome-ignore lint/suspicious/noExplicitAny: custom streaming route in mock client only
-			const options = (eden as any).api.live.numbers.get.streamedOptions()
+			const options = eden.api.live.numbers.get.streamedOptions()
 			const result = await queryClient.fetchQuery(options)
 
-			expect(result).toEqual([1, 2, 3])
+			expect(result).toEqual(["1", "2", "3"])
 		})
 
 		test("liveOptions resolves to the latest streamed value", async () => {
 			const eden = createEden()
-			// biome-ignore lint/suspicious/noExplicitAny: custom streaming route in mock client only
-			const options = (eden as any).api.live.numbers.get.liveOptions()
+			const options = eden.api.live.numbers.get.liveOptions()
 			const result = await queryClient.fetchQuery(options)
 
-			expect(result).toBe(3)
+			expect(result).toBe("3")
 		})
 
 		test("mutates data via mutationOptions", async () => {
