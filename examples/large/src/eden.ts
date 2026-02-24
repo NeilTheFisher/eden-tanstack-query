@@ -1,5 +1,5 @@
 import { treaty } from "@elysiajs/eden"
-import { createEdenTanStackQuery } from "eden-tanstack-react-query"
+import { createEdenTanStackQuery } from "@neilthefisher/eden-tanstack-react-query"
 
 import type { App } from "./server"
 

@@ -24,7 +24,7 @@
 		"@tanstack/react-query-devtools": "^5.91.2",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
-		"eden-tanstack-react-query": "workspace:*",
+		"@neilthefisher/eden-tanstack-react-query": "workspace:*",
 		"elysia": "1.4.22",
 		"lucide-react": "^0.563.0",
 		"react": "19.2.3",

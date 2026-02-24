@@ -21,7 +21,7 @@ jobs:
         run: bun install
 
       - name: Build package
-        run: bun run --filter=eden-tanstack-react-query build
+        run: bun run --filter=@neilthefisher/eden-tanstack-react-query build
 
       - name: Type check
         run: bun run test:types
