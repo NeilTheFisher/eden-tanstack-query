@@ -1,5 +1,5 @@
 import type { treaty } from "@elysiajs/eden"
-import { Elysia, t } from "elysia"
+import { Elysia, sse, t } from "elysia"
 import { createEdenOptionsProxy } from "../../src/proxy/createOptionsProxy"
 import { createTestQueryClient } from "../../test-utils"
 
@@ -9,6 +9,11 @@ import { createTestQueryClient } from "../../test-utils"
 
 const app = new Elysia()
 	.get("/api/hello", () => "world")
+	.get("/api/live/numbers", async function* () {
+		yield sse("1")
+		yield sse("2")
+		yield sse("3")
+	})
 	.get(
 		"/api/users",
 		({ query }) => {
@@ -100,6 +105,11 @@ describe("createEdenOptionsProxy", () => {
 	// We use the app type but create a mock implementation
 	function createMockTreatyClient() {
 		const usersById: Record<string, unknown> = {}
+		const createNumberStream = async function* () {
+			yield "1"
+			yield "2"
+			yield "3"
+		}
 
 		const mockClient = {
 			api: {
@@ -161,6 +171,14 @@ describe("createEdenOptionsProxy", () => {
 						},
 						error: null,
 					}),
+				},
+				live: {
+					numbers: {
+						get: async () => ({
+							data: createNumberStream(),
+							error: null,
+						}),
+					},
 				},
 			},
 		}
@@ -262,6 +280,8 @@ describe("createEdenOptionsProxy", () => {
 			const procedure = eden.api.hello.get
 
 			expect(typeof procedure.queryOptions).toBe("function")
+			expect(typeof procedure.streamedOptions).toBe("function")
+			expect(typeof procedure.liveOptions).toBe("function")
 			expect(typeof procedure.queryKey).toBe("function")
 			expect(typeof procedure.queryFilter).toBe("function")
 			expect(typeof procedure.infiniteQueryOptions).toBe("function")
@@ -387,6 +407,22 @@ describe("createEdenOptionsProxy", () => {
 			const result = await queryClient.fetchQuery(options)
 
 			expect(result).toEqual([{ id: "1", name: "John", status: "active" }])
+		})
+
+		test("streamedOptions collects async iterable into a list", async () => {
+			const eden = createEden()
+			const options = eden.api.live.numbers.get.streamedOptions()
+			const result = await queryClient.fetchQuery(options)
+
+			expect(result).toEqual(["1", "2", "3"])
+		})
+
+		test("liveOptions resolves to the latest streamed value", async () => {
+			const eden = createEden()
+			const options = eden.api.live.numbers.get.liveOptions()
+			const result = await queryClient.fetchQuery(options)
+
+			expect(result).toBe("3")
 		})
 
 		test("mutates data via mutationOptions", async () => {

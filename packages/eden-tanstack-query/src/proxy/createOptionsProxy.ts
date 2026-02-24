@@ -75,6 +75,19 @@ function isMutationMethod(prop: string): prop is MutationMethod {
 }
 
 /**
+ * Check if value is an async iterable.
+ */
+function isAsyncIterable(value: unknown): value is AsyncIterable<unknown> {
+	return (
+		value !== null &&
+		value !== undefined &&
+		typeof (value as { [Symbol.asyncIterator]?: unknown })[
+			Symbol.asyncIterator
+		] === "function"
+	)
+}
+
+/**
  * Get the last element of paths array (the HTTP method)
  */
 function getMethod(paths: string[]): string {
@@ -200,6 +213,93 @@ function createQueryProcedure(opts: ProcedureOptions) {
 
 					if (result.error) throw result.error
 					return result.data
+				},
+				opts: queryOpts as Parameters<typeof edenQueryOptions>[0]["opts"],
+			})
+		},
+
+		streamedOptions: (input?: unknown, queryOpts?: unknown) => {
+			const inputForKey =
+				pathParams.length > 0
+					? { ...mergePathParams(pathParams), ...(input as object) }
+					: input
+			return edenQueryOptions({
+				path: paths,
+				input: inputForKey,
+				fetch: async (_inputForKey, signal) => {
+					const actualInput = input
+					const pathWithoutMethod = paths.slice(0, -1)
+					const method = getMethod(paths)
+					const edenEndpoint = navigateToEdenPath(
+						client,
+						pathWithoutMethod,
+						pathParams,
+					)
+					const methodFn = (edenEndpoint as Record<string, unknown>)[
+						method
+					] as (opts: unknown) => Promise<{ data: unknown; error: unknown }>
+					const result = await methodFn({
+						query: actualInput,
+						fetch: { signal },
+					})
+
+					if (result.error) throw result.error
+					if (result.data == null) return []
+					if (!isAsyncIterable(result.data)) {
+						throw new Error(
+							"Expected an async iterable response for streamedOptions",
+						)
+					}
+					const streamedData: unknown[] = []
+					for await (const chunk of result.data) {
+						streamedData.push(chunk)
+					}
+					return streamedData
+				},
+				opts: queryOpts as Parameters<typeof edenQueryOptions>[0]["opts"],
+			})
+		},
+
+		liveOptions: (input?: unknown, queryOpts?: unknown) => {
+			const inputForKey =
+				pathParams.length > 0
+					? { ...mergePathParams(pathParams), ...(input as object) }
+					: input
+			return edenQueryOptions({
+				path: paths,
+				input: inputForKey,
+				fetch: async (_inputForKey, signal) => {
+					const actualInput = input
+					const pathWithoutMethod = paths.slice(0, -1)
+					const method = getMethod(paths)
+					const edenEndpoint = navigateToEdenPath(
+						client,
+						pathWithoutMethod,
+						pathParams,
+					)
+					const methodFn = (edenEndpoint as Record<string, unknown>)[
+						method
+					] as (opts: unknown) => Promise<{ data: unknown; error: unknown }>
+					const result = await methodFn({
+						query: actualInput,
+						fetch: { signal },
+					})
+
+					if (result.error) throw result.error
+					if (result.data == null) return undefined
+					if (!isAsyncIterable(result.data)) {
+						throw new Error(
+							"Expected an async iterable response for liveOptions",
+						)
+					}
+					let latestChunk: unknown
+					let hasChunk = false
+					for await (const chunk of result.data) {
+						hasChunk = true
+						latestChunk = chunk
+					}
+					if (!hasChunk) return undefined
+					return latestChunk
 				},
 				opts: queryOpts as Parameters<typeof edenQueryOptions>[0]["opts"],
 			})
