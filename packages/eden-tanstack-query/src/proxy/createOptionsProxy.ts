@@ -293,9 +293,12 @@ function createQueryProcedure(opts: ProcedureOptions) {
 						)
 					}
 					let latestChunk: unknown
+					let hasChunk = false
 					for await (const chunk of result.data) {
+						hasChunk = true
 						latestChunk = chunk
 					}
+					if (!hasChunk) return undefined
 					return latestChunk
 				},
 				opts: queryOpts as Parameters<typeof edenQueryOptions>[0]["opts"],
