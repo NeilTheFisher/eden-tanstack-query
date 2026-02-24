@@ -7,6 +7,7 @@ Publishing to npm happens automatically via GitHub Actions with OIDC (no tokens 
 ### Release Steps
 
 1. **Update version** in `packages/eden-tanstack-query/package.json`
+   - Package name is configured in the same file (`name`), currently `@neilthefisher/eden-tanstack-react-query`
 
 2. **Commit and push**
    ```bash
@@ -28,8 +29,8 @@ Publishing to npm happens automatically via GitHub Actions with OIDC (no tokens 
 
 ### Monitoring
 
-- Progress: https://github.com/xkelxmc/eden-tanstack-query/actions
-- npm: https://www.npmjs.com/package/eden-tanstack-react-query
+- Progress: https://github.com/NeilTheFisher/eden-tanstack-query/actions
+- npm: https://www.npmjs.com/package/@neilthefisher/eden-tanstack-react-query
 
 ## Versioning
 
@@ -57,6 +58,9 @@ bun publish --access public
 
 ## Setup (already done)
 
-- **Trusted Publisher** configured on npm for `eden-tanstack-react-query`
+- **Trusted Publisher** configured on npm for `@neilthefisher/eden-tanstack-react-query`
 - **GitHub Actions** workflow: `.github/workflows/publish.yml`
 - **OIDC permissions**: `id-token: write` in workflow
+- **Secrets used by workflows**:
+  - `CODECOV_TOKEN` (used in `.github/workflows/test.yml` for Codecov upload)
+  - No `NPM_TOKEN` is required by publish workflow when Trusted Publisher/OIDC is configured

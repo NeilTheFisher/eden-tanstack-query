@@ -11,7 +11,7 @@
 		"start": "node .output/server/index.mjs"
 	},
 	"dependencies": {
-		"eden-tanstack-react-query": "workspace:*",
+		"@neilthefisher/eden-tanstack-react-query": "workspace:*",
 		"@radix-ui/react-popover": "^1.1.15",
 		"@tanstack/react-router": "^1.158.0",
 		"@tanstack/react-start": "^1.158.0",

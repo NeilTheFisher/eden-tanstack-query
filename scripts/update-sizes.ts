@@ -88,7 +88,7 @@ async function main() {
 	console.log("\n📦 Calculating bundle sizes...\n")
 
 	const size = await calculatePackageSize(
-		"eden-tanstack-react-query",
+		"@neilthefisher/eden-tanstack-react-query",
 		"packages/eden-tanstack-query/dist",
 	)
 
