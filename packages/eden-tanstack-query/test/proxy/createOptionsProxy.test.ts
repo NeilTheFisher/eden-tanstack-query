@@ -9,13 +9,10 @@ import { createTestQueryClient } from "../../test-utils"
 
 const app = new Elysia()
 	.get("/api/hello", () => "world")
-	.get("/api/live/numbers", () => {
-		const stream = async function* () {
-			yield sse("1")
-			yield sse("2")
-			yield sse("3")
-		}
-		return stream()
+	.get("/api/live/numbers", async function* () {
+		yield sse("1")
+		yield sse("2")
+		yield sse("3")
 	})
 	.get(
 		"/api/users",

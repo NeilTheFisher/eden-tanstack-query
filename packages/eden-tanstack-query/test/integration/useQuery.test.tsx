@@ -23,13 +23,10 @@ import { createEdenTanStackQuery } from "../../src"
 
 const app = new Elysia()
 	.get("/hello", () => ({ message: "Hello from Elysia!" }))
-	.get("/live/numbers", () => {
-		const stream = async function* () {
-			yield sse("1")
-			yield sse("2")
-			yield sse("3")
-		}
-		return stream()
+	.get("/live/numbers", async function* () {
+		yield sse("1")
+		yield sse("2")
+		yield sse("3")
 	})
 	.get("/users", () => [
 		{ id: "1", name: "Alice" },
