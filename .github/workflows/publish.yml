@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to publish (e.g. v1.2.3)'
+        description: 'Tag/version to publish (e.g. v1.2.3); it can be a new tag for manual runs'
         required: true
         type: string
 
@@ -21,7 +21,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+          ref: ${{ github.ref }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
