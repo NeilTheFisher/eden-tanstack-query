@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to publish (e.g. v1.2.3)'
+        required: true
+        type: string
 
 jobs:
   publish:
@@ -14,6 +20,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -48,7 +56,10 @@ jobs:
 
       - name: Get version from tag
         id: version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        run: |
+          TAG="${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}"
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+          echo "VERSION=${TAG#v}" >> $GITHUB_OUTPUT
 
       - name: Extract changelog
         id: changelog
@@ -65,10 +76,10 @@ jobs:
 
       - name: Create GitHub Release
         run: |
-          if gh release view ${{ github.ref_name }} > /dev/null 2>&1; then
-            echo "Release ${{ github.ref_name }} already exists, skipping"
+          if gh release view ${{ steps.version.outputs.TAG }} > /dev/null 2>&1; then
+            echo "Release ${{ steps.version.outputs.TAG }} already exists, skipping"
           else
-            gh release create ${{ github.ref_name }} \
+            gh release create ${{ steps.version.outputs.TAG }} \
               --title "@neilthefisher/eden-tanstack-react-query ${{ steps.version.outputs.VERSION }}" \
               --notes-file release_notes.md
           fi
