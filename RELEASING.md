@@ -27,6 +27,8 @@ Publishing to npm happens automatically via GitHub Actions with OIDC (no tokens 
    - Build the package
    - Publish to npm via OIDC
 
+For **Run workflow** (manual dispatch), pick the branch to publish from in the UI and provide the release tag value (it does not need to already exist as a git ref).
+
 ### Monitoring
 
 - Progress: https://github.com/NeilTheFisher/eden-tanstack-query/actions
