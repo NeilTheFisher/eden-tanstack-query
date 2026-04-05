@@ -181,6 +181,7 @@ type TQMethodParam<Body, Headers, Query, Params> = MaybeEmptyObject<Headers, "he
   TQParamBase;
 
 type OmitQueryInput<T> = Omit<T, "body" | "headers" | "fetch">;
+type OmitQueryKeyInput<T> = Omit<T, "headers" | "fetch">;
 
 type EdenMethodBaseQueryKey<Params, Query> = readonly [
   ...QueryKey,
@@ -296,7 +297,7 @@ export interface EdenTQMethod<Body, Headers, Query, Params, Res> {
   ): Promise<EdenRawResponse<Res>>;
 
   queryKey(
-    input?: OmitQueryInput<TQMethodParam<Body, Headers, Query, Params>>,
+    input?: OmitQueryKeyInput<TQMethodParam<Body, Headers, Query, Params>>,
   ): EdenMethodQueryKey<Params, Query, Res>;
 
   queryOptions<TData = ExtractData<Res>>(
@@ -438,7 +439,7 @@ export namespace EdenTQ {
 
 export interface EdenTQUtilsMethod<Body, Headers, Query, Params, Res> {
   queryKey(
-    input?: OmitQueryInput<TQMethodParam<Body, Headers, Query, Params>>,
+    input?: OmitQueryKeyInput<TQMethodParam<Body, Headers, Query, Params>>,
   ): EdenMethodQueryKey<Params, Query, Res>;
 
   queryOptions<TData = ExtractData<Res>>(

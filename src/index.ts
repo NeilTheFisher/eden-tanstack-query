@@ -171,6 +171,7 @@ function createMethodDecorator(ctx: ProxyContext, paths: string[], method: strin
   fn.queryKey = (input?: {
     params?: Record<string, string | number>;
     query?: unknown;
+    body?: unknown;
   }): QueryKey => {
     return buildQueryKey(ctx.prefix, method, pathTemplate, input);
   };
