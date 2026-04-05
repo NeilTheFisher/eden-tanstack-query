@@ -1,7 +1,7 @@
 import { Elysia, t } from "elysia";
 import { createEdenTQ, createEdenTQUtils } from "../src";
 import { QueryClient } from "@tanstack/query-core";
-import { describe, expect, it, mock } from "bun:test";
+import { describe, expect, it, vi } from "vite-plus/test";
 
 const posts = Array.from({ length: 50 }, (_, i) => ({
   id: `post-${i + 1}`,
@@ -340,8 +340,8 @@ describe("Query Options extensions", () => {
   });
 
   it("mutation options accepts callbacks", () => {
-    const onMutate = mock(() => {});
-    const onSuccess = mock(() => {});
+    const onMutate = vi.fn(() => {});
+    const onSuccess = vi.fn(() => {});
 
     const options = eden.user.post.mutationOptions({
       onMutate,
@@ -364,7 +364,6 @@ describe("Error handling", () => {
 
     const options = badEden.get.queryOptions({});
 
-    // eslint-disable-next-line typescript-eslint/await-thenable -- bun:test .rejects returns a Promise
     await expect(queryClient.fetchQuery(options)).rejects.toThrow();
   });
 
@@ -375,7 +374,7 @@ describe("Error handling", () => {
 
     try {
       await options.queryFn();
-      expect.unreachable("Should have thrown");
+      expect.fail("Should have thrown");
     } catch (error) {
       expect(error).toBeDefined();
       expect(error).not.toBeNull();
@@ -387,7 +386,6 @@ describe("Error handling", () => {
 
     const options = badEden.user.post.mutationOptions();
 
-    // eslint-disable-next-line typescript-eslint/await-thenable -- bun:test .rejects returns a Promise
     await expect(
       options.mutationFn({ body: { name: "Test", email: "test@test.com" } }),
     ).rejects.toThrow();

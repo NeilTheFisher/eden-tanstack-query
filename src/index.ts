@@ -48,9 +48,19 @@ function buildQueryKey(
   prefix: QueryKey,
   method: string,
   pathTemplate: string[],
-  input?: { params?: unknown; query?: unknown },
+  input?: { params?: unknown; query?: unknown; body?: unknown },
 ): QueryKey {
-  return [...prefix, method, pathTemplate, input?.params ?? null, input?.query ?? null] as const;
+  const key: unknown[] = [
+    ...prefix,
+    method,
+    pathTemplate,
+    input?.params ?? null,
+    input?.query ?? null,
+  ];
+  if (input?.body !== undefined) {
+    key.push(input.body);
+  }
+  return key as QueryKey;
 }
 
 function callTreaty(

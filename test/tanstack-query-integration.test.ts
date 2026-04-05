@@ -1,7 +1,7 @@
 import { Elysia, t } from "elysia";
 import { createEdenTQ } from "../src";
 import { QueryClient } from "@tanstack/query-core";
-import { describe, expect, it, test } from "bun:test";
+import { describe, expect, it, test } from "vite-plus/test";
 import { expectTypeOf } from "expect-type";
 
 const ShareLinkSchema = t.Object({

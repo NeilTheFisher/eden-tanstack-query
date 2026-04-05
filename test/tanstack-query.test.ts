@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia";
 import { createEdenTQ, createEdenTQFromSchema } from "../src";
-import { describe, expect, it, mock } from "bun:test";
+import { describe, expect, it, vi } from "vite-plus/test";
 
 const app = new Elysia()
   .get("/", () => "hello")
@@ -140,7 +140,7 @@ describe("createEdenTQ", () => {
 
   describe("invalidate", () => {
     it("calls queryClient.invalidateQueries with correct key", async () => {
-      const mockInvalidate = mock(() => Promise.resolve());
+      const mockInvalidate = vi.fn(() => Promise.resolve());
       const mockQueryClient = {
         invalidateQueries: mockInvalidate,
       };
@@ -156,7 +156,7 @@ describe("createEdenTQ", () => {
     });
 
     it("supports exact invalidation", async () => {
-      const mockInvalidate = mock(() => Promise.resolve());
+      const mockInvalidate = vi.fn(() => Promise.resolve());
       const mockQueryClient = {
         invalidateQueries: mockInvalidate,
       };
@@ -170,7 +170,7 @@ describe("createEdenTQ", () => {
     });
 
     it("invalidates all queries for a route when no input", async () => {
-      const mockInvalidate = mock(() => Promise.resolve());
+      const mockInvalidate = vi.fn(() => Promise.resolve());
       const mockQueryClient = {
         invalidateQueries: mockInvalidate,
       };

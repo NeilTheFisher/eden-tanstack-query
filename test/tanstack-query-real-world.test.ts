@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia";
 import { createEdenTQ } from "../src";
-import { describe, expect, it, mock } from "bun:test";
+import { describe, expect, it, vi } from "vite-plus/test";
 import { expectTypeOf } from "expect-type";
 
 const ShareLinkSchema = t.Object({
@@ -318,7 +318,7 @@ describe("Real-world API patterns", () => {
   describe("Invalidation patterns", () => {
     it("can invalidate share links for a case", async () => {
       const caseId = "case-inv";
-      const mockInvalidate = mock(() => Promise.resolve());
+      const mockInvalidate = vi.fn(() => Promise.resolve());
       const mockQueryClient = { invalidateQueries: mockInvalidate };
 
       await eden
@@ -333,7 +333,7 @@ describe("Real-world API patterns", () => {
 
     it("can invalidate all share links queries", async () => {
       const caseId = "any";
-      const mockInvalidate = mock(() => Promise.resolve());
+      const mockInvalidate = vi.fn(() => Promise.resolve());
       const mockQueryClient = { invalidateQueries: mockInvalidate };
 
       await eden.cases({ id: caseId })["share-links"].get.invalidate(mockQueryClient);
