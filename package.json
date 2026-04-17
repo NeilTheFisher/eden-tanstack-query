@@ -1,7 +1,7 @@
 {
-  "name": "eden-tanstack-query",
-  "version": "0.1.0-alpha.4",
-  "description": "TanStack Query integration for Elysia Eden - type-safe queries and mutations",
+  "name": "@neilthefisher/eden-tanstack-query",
+  "version": "0.2.0",
+  "description": "TanStack Query integration for Elysia Eden with SSE (streamed/live) support. Fork of Frank-III/eden-tanstack-query.",
   "keywords": [
     "eden",
     "elysia",
@@ -13,16 +13,22 @@
     "type-safe",
     "vue-query"
   ],
-  "homepage": "https://github.com/Frank-III/eden-tanstack-query",
-  "bugs": "https://github.com/Frank-III/eden-tanstack-query/issues",
+  "homepage": "https://github.com/NeilTheFisher/eden-tanstack-query",
+  "bugs": "https://github.com/NeilTheFisher/eden-tanstack-query/issues",
   "license": "MIT",
   "author": {
-    "name": "Frank-III",
-    "url": "https://github.com/Frank-III"
+    "name": "Neil Fisher",
+    "url": "https://github.com/NeilTheFisher"
   },
+  "contributors": [
+    {
+      "name": "Frank-III",
+      "url": "https://github.com/Frank-III"
+    }
+  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Frank-III/eden-tanstack-query.git"
+    "url": "git+https://github.com/NeilTheFisher/eden-tanstack-query.git"
   },
   "files": [
     "dist",
@@ -37,6 +43,9 @@
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
     }
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "vp pack",
