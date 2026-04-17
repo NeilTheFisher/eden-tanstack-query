@@ -1,4 +1,4 @@
-import { Elysia, t } from "elysia";
+import { Elysia, sse, t } from "elysia";
 import { QueryClient } from "@tanstack/query-core";
 import { createEdenTQ } from "../src";
 import { describe, expect, it } from "vite-plus/test";
@@ -79,5 +79,38 @@ describe("liveOptions", () => {
     const options = plainEden.plain.get.liveOptions<unknown>(undefined, { retry: false });
 
     await expect(client.fetchQuery(options)).rejects.toThrow(/AsyncIterable/);
+  });
+});
+
+describe("Elysia sse() helper compatibility", () => {
+  const sseApp = new Elysia()
+    .get("/sse-stream", async function* () {
+      yield sse({ data: "alpha", event: "message" });
+      yield sse({ data: "beta", event: "message" });
+      yield sse({ data: "gamma", event: "message" });
+    })
+    .get("/sse-live", async function* () {
+      yield sse({ data: { tick: 1 } });
+      yield sse({ data: { tick: 2 } });
+    });
+
+  const eden = createEdenTQ<typeof sseApp>(sseApp);
+
+  it("streamedOptions accumulates chunks from a route returning sse() payloads", async () => {
+    const client = new QueryClient();
+    const options = eden["sse-stream"].get.streamedOptions();
+
+    const data = await client.fetchQuery(options);
+    expect(Array.isArray(data)).toBe(true);
+    expect(data).toHaveLength(3);
+  });
+
+  it("liveOptions resolves to the last sse() chunk", async () => {
+    const client = new QueryClient();
+    const options = eden["sse-live"].get.liveOptions();
+
+    const final = await client.fetchQuery(options);
+    expect(final).toBeDefined();
+    expect(client.getQueryData(options.queryKey)).toEqual(final);
   });
 });
