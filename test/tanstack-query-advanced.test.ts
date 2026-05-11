@@ -354,8 +354,11 @@ describe("Query Options extensions", () => {
 });
 
 describe("Error handling", () => {
+  const badEden = createEdenTQ<typeof app>("http://localhost:9999", {
+    fetch: { signal: AbortSignal.timeout(500) },
+  });
+
   it("queryFn throws on API error, making error available to TanStack Query", async () => {
-    const badEden = createEdenTQ<typeof app>("http://localhost:9999");
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
@@ -368,8 +371,6 @@ describe("Error handling", () => {
   });
 
   it("queryFn throws the actual error from treaty response", async () => {
-    const badEden = createEdenTQ<typeof app>("http://localhost:9999");
-
     const options = badEden.get.queryOptions({});
 
     try {
@@ -382,8 +383,6 @@ describe("Error handling", () => {
   });
 
   it("mutationFn throws on API error", async () => {
-    const badEden = createEdenTQ<typeof app>("http://localhost:9999");
-
     const options = badEden.user.post.mutationOptions();
 
     await expect(
@@ -392,7 +391,6 @@ describe("Error handling", () => {
   });
 
   it("QueryClient captures error in query state", async () => {
-    const badEden = createEdenTQ<typeof app>("http://localhost:9999");
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },

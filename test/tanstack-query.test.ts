@@ -84,6 +84,15 @@ describe("createEdenTQ", () => {
       expect(data).toBe("hello");
     });
 
+    it("accepts no arguments for routes without required params", async () => {
+      const options = eden.get.queryOptions();
+
+      expect(options.queryKey).toEqual(["eden", "get", [], null, null]);
+
+      const data = await options.queryFn();
+      expect(data).toBe("hello");
+    });
+
     it("works with route params", async () => {
       const options = eden.user({ id: "42" }).get.queryOptions({
         params: { id: "42" },
@@ -221,7 +230,9 @@ describe("createEdenTQ", () => {
     });
 
     it("returns error in result for failed requests", async () => {
-      const badEden = createEdenTQ<typeof app>("http://localhost:9999");
+      const badEden = createEdenTQ<typeof app>("http://localhost:9999", {
+        fetch: { signal: AbortSignal.timeout(500) },
+      });
       const result = await badEden.get({});
 
       expect(result.data).toBeNull();

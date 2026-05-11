@@ -235,7 +235,7 @@ function createMethodDecorator(ctx: ProxyContext, paths: string[], method: strin
   };
 
   fn.queryOptions = <TData = unknown>(
-    input: MethodDecoratorInput,
+    input?: MethodDecoratorInput,
     overrides?: Partial<EdenQueryOptions<TData, unknown, TData>>,
   ): EdenQueryOptions<TData, unknown, TData> => {
     return {
@@ -245,7 +245,7 @@ function createMethodDecorator(ctx: ProxyContext, paths: string[], method: strin
         return dataOrThrow(
           callTreaty(ctx.raw, materializedPath, method, {
             ...input,
-            fetch: withContextSignal(input.fetch, context?.signal),
+            fetch: withContextSignal(input?.fetch, context?.signal),
           }),
         );
       },

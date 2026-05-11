@@ -203,95 +203,77 @@ type EdenMethodInfiniteQueryKey<Params, Query, Res, TPageParam> = DataTag<
   ExtractError<Res>
 >;
 
-export interface EdenQueryOptions<
+export type EdenQueryOptions<
   TQueryFnData = unknown,
   TError = unknown,
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
-> extends Omit<
+> = Omit<
   QueryObserverOptions<TQueryFnData, TError, TData, TQueryFnData, TQueryKey>,
-  "queryKey" | "queryFn" | "persister"
-> {
+  "queryKey" | "queryFn"
+> & {
   queryKey: TQueryKey;
   queryFn: (context?: QueryFunctionContext<TQueryKey>) => Promise<TQueryFnData>;
-}
+};
 
-export interface EdenInfiniteQueryOptions<
+export type EdenInfiniteQueryOptions<
   TQueryFnData = unknown,
   TError = unknown,
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
   TPageParam = unknown,
-> extends Omit<
+> = Omit<
   InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>,
-  | "queryKey"
-  | "queryFn"
-  | "initialPageParam"
-  | "getNextPageParam"
-  | "getPreviousPageParam"
-  | "persister"
-> {
+  "queryKey" | "queryFn"
+> & {
   queryKey: TQueryKey;
   queryFn: (context: QueryFunctionContext<TQueryKey, TPageParam>) => Promise<TQueryFnData>;
   initialPageParam: TPageParam;
   getNextPageParam: GetNextPageParamFunction<TPageParam, TQueryFnData>;
-  getPreviousPageParam?: GetPreviousPageParamFunction<TPageParam, TQueryFnData>;
-}
+};
 
 export interface StreamedQueryFnOptions {
-  /**
-   * Controls how chunks are handled when the query is refetched while previous data is present.
-   * - "append": keep previous chunks, append new ones.
-   * - "reset": clear data back to undefined, then fill as chunks arrive.
-   * - "replace": keep the last rendered array until the new stream completes, then swap.
-   */
   refetchMode?: "append" | "reset" | "replace";
 }
 
-export interface EdenStreamedQueryOptions<
+export type EdenStreamedQueryOptions<
   TChunk = unknown,
   TError = unknown,
   TData = TChunk[],
   TQueryKey extends QueryKey = QueryKey,
-> extends Omit<
+> = Omit<
   QueryObserverOptions<TChunk[], TError, TData, TChunk[], TQueryKey>,
-  "queryKey" | "queryFn" | "persister"
-> {
+  "queryKey" | "queryFn"
+> & {
   queryKey: TQueryKey;
   queryFn: (context: QueryFunctionContext<TQueryKey>) => Promise<TChunk[]>;
-}
+};
 
-export interface EdenLiveQueryOptions<
+export type EdenLiveQueryOptions<
   TChunk = unknown,
   TError = unknown,
   TData = TChunk,
   TQueryKey extends QueryKey = QueryKey,
-> extends Omit<
-  QueryObserverOptions<TChunk, TError, TData, TChunk, TQueryKey>,
-  "queryKey" | "queryFn" | "persister"
-> {
+> = Omit<QueryObserverOptions<TChunk, TError, TData, TChunk, TQueryKey>, "queryKey" | "queryFn"> & {
   queryKey: TQueryKey;
   queryFn: (context: QueryFunctionContext<TQueryKey>) => Promise<TChunk>;
-}
+};
 
 type AsyncIterableElement<T> =
   T extends AsyncIterable<infer U> ? U : T extends AsyncGenerator<infer U, any, any> ? U : T;
 
-export interface EdenMutationOptions<
+export type EdenMutationOptions<
   TData = unknown,
   TError = unknown,
   TVariables = unknown,
   TOnMutateResult = unknown,
-> extends Omit<
-  MutationObserverOptions<TData, TError, TVariables, TOnMutateResult>,
-  "mutationKey" | "mutationFn"
-> {
+> = MutationObserverOptions<TData, TError, TVariables, TOnMutateResult> & {
   mutationKey: QueryKey;
   mutationFn: (variables: TVariables) => Promise<TData>;
-}
+};
 
 type EdenQueryOverrides<TQueryFnData, TError, TData, TQueryKey extends QueryKey> = Partial<
-  Omit<EdenQueryOptions<TQueryFnData, TError, TData, TQueryKey>, "queryKey" | "queryFn">
+  QueryObserverOptions<TQueryFnData, TError, TData, TQueryFnData, TQueryKey>
 >;
 
 type EdenInfiniteQueryOverrides<
@@ -302,7 +284,7 @@ type EdenInfiniteQueryOverrides<
   TPageParam,
 > = Partial<
   Omit<
-    EdenInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>,
+    InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>,
     "queryKey" | "queryFn" | "initialPageParam" | "getNextPageParam" | "getPreviousPageParam"
   >
 >;
@@ -340,7 +322,7 @@ export interface EdenTQMethod<Body, Headers, Query, Params, Res> {
   ): EdenMethodQueryKey<Params, Query, Res>;
 
   queryOptions<TData = ExtractData<Res>>(
-    input: TQMethodParam<Body, Headers, Query, Params>,
+    input?: TQMethodParam<Body, Headers, Query, Params>,
     overrides?: EdenQueryOverrides<
       ExtractData<Res>,
       ExtractError<Res>,
@@ -517,7 +499,7 @@ export interface EdenTQUtilsMethod<Body, Headers, Query, Params, Res> {
   ): EdenMethodQueryKey<Params, Query, Res>;
 
   queryOptions<TData = ExtractData<Res>>(
-    input: TQMethodParam<Body, Headers, Query, Params>,
+    input?: TQMethodParam<Body, Headers, Query, Params>,
     overrides?: EdenQueryOverrides<
       ExtractData<Res>,
       ExtractError<Res>,
