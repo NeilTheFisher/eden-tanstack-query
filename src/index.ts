@@ -4,8 +4,8 @@ import type {
   QueryFunctionContext,
   QueryFunction,
 } from "@tanstack/query-core";
-import { experimental_streamedQuery } from "@tanstack/query-core";
 import { treaty } from "@elysiajs/eden/treaty2";
+import { streamedQuery } from "./streamedQuery";
 import type {
   EdenAppLike,
   EdenRawResponse,
@@ -316,7 +316,7 @@ function createMethodDecorator(ctx: ProxyContext, paths: string[], method: strin
     const { queryFnOptions, ...rest } = overrides ?? {};
     return {
       queryKey: fn.queryKey(input),
-      queryFn: experimental_streamedQuery<TChunk, TChunk[], QueryKey>({
+      queryFn: streamedQuery<TChunk, TChunk[], QueryKey>({
         streamFn: buildStreamFn<TChunk>(input),
         refetchMode: queryFnOptions?.refetchMode,
       }) as EdenStreamedQueryOptions<TChunk, unknown, TChunk[]>["queryFn"],

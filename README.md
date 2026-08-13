@@ -4,6 +4,8 @@ TanStack Query integration for [Elysia Eden](https://github.com/elysiajs/eden) -
 
 Fork of [Frank-III/eden-tanstack-query](https://github.com/Frank-III/eden-tanstack-query) with added SSE support (`.streamedOptions` / `.liveOptions`).
 
+Has **no runtime dependency on a specific TanStack Query version** — it only references `@tanstack/query-core` for types, so it works with whatever 5.x version you have installed.
+
 Highlights:
 
 - Auto-generated `queryKey`, `queryOptions`, `mutationOptions`, `mutation`, and cache helpers
