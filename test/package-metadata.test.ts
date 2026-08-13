@@ -10,6 +10,6 @@ describe("package metadata", () => {
       peerDependencies?: Record<string, string>;
     };
 
-    expect(pkg.peerDependencies?.elysia).toBe(">=1.0.0");
+    expect(pkg.peerDependencies?.elysia).toBe(">=2.0.0-beta.1");
   });
 });

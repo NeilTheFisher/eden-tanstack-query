@@ -4,7 +4,7 @@ TanStack Query integration for [Elysia Eden](https://github.com/elysiajs/eden) -
 
 Fork of [Frank-III/eden-tanstack-query](https://github.com/Frank-III/eden-tanstack-query) with added SSE support (`.streamedOptions` / `.liveOptions`).
 
-Has **no runtime dependency on a specific TanStack Query version** — it only references `@tanstack/query-core` for types, so it works with whatever 5.x version you have installed.
+Built for **Elysia 2** (kiana). Targets the `@elysia/*` plugin scope and has **no runtime dependency on a specific TanStack Query version** — it only references `@tanstack/query-core` for types, so it works with whatever 5.x version you have installed.
 
 Highlights:
 
@@ -16,9 +16,9 @@ Highlights:
 ## Installation
 
 ```bash
-bun add @neilthefisher/eden-tanstack-query @elysiajs/eden @tanstack/query-core elysia
+bun add @neilthefisher/eden-tanstack-query @elysia/eden @tanstack/query-core elysia
 # or
-npm install @neilthefisher/eden-tanstack-query @elysiajs/eden @tanstack/query-core elysia
+npm install @neilthefisher/eden-tanstack-query @elysia/eden @tanstack/query-core elysia
 ```
 
 ## Usage

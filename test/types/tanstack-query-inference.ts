@@ -11,11 +11,6 @@ import { expectTypeOf } from "expect-type";
 const app = new Elysia()
   .get(
     "/user/:id",
-    ({ params }) => ({
-      id: params.id,
-      name: "John",
-      email: "john@example.com",
-    }),
     {
       response: t.Object({
         id: t.String(),
@@ -23,13 +18,14 @@ const app = new Elysia()
         email: t.String(),
       }),
     },
+    ({ params }) => ({
+      id: params.id,
+      name: "John",
+      email: "john@example.com",
+    }),
   )
   .post(
     "/user",
-    ({ body }) => ({
-      id: "1",
-      ...body,
-    }),
     {
       body: t.Object({
         name: t.String(),
@@ -41,14 +37,13 @@ const app = new Elysia()
         email: t.String(),
       }),
     },
+    ({ body }) => ({
+      id: "1",
+      ...body,
+    }),
   )
   .post(
     "/cases/:id/share-link",
-    ({ params, body }) => ({
-      id: "link-1",
-      caseId: params.id,
-      expiresInDays: body.expiresInDays ?? 7,
-    }),
     {
       body: t.Object({
         contactId: t.Optional(t.String()),
@@ -60,6 +55,11 @@ const app = new Elysia()
         expiresInDays: t.Number(),
       }),
     },
+    ({ params, body }) => ({
+      id: "link-1",
+      caseId: params.id,
+      expiresInDays: body.expiresInDays ?? 7,
+    }),
   );
 
 const eden = createEdenTQ<typeof app>("http://localhost:3000");

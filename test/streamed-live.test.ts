@@ -6,14 +6,14 @@ import { describe, expect, it } from "vite-plus/test";
 const app = new Elysia()
   .get(
     "/chat",
+    {
+      query: t.Object({ count: t.Optional(t.String()) }),
+    },
     async function* ({ query }) {
       const count = Number(query.count ?? 3);
       for (let i = 0; i < count; i++) {
         yield `chunk-${i}`;
       }
-    },
-    {
-      query: t.Object({ count: t.Optional(t.String()) }),
     },
   )
   .get("/counter", async function* () {

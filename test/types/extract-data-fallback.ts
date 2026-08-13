@@ -15,20 +15,28 @@ import { expectTypeOf } from "expect-type";
 // ============================================================================
 {
   const app = new Elysia()
-    .get("/users", () => [{ id: "1", name: "John" }], {
-      response: t.Array(
-        t.Object({
+    .get(
+      "/users",
+      {
+        response: t.Array(
+          t.Object({
+            id: t.String(),
+            name: t.String(),
+          }),
+        ),
+      },
+      () => [{ id: "1", name: "John" }],
+    )
+    .get(
+      "/user/:id",
+      {
+        response: t.Object({
           id: t.String(),
           name: t.String(),
         }),
-      ),
-    })
-    .get("/user/:id", ({ params }) => ({ id: params.id, name: "John" }), {
-      response: t.Object({
-        id: t.String(),
-        name: t.String(),
-      }),
-    });
+      },
+      ({ params }) => ({ id: params.id, name: "John" }),
+    );
 
   const eden = createEdenTQ<typeof app>("http://localhost:3000");
 
@@ -112,11 +120,15 @@ import { expectTypeOf } from "expect-type";
 {
   const app = new Elysia().group("/api", (app) =>
     app.group("/v1", (app) =>
-      app.get("/users", () => ({ users: [{ id: "1" }] }), {
-        response: t.Object({
-          users: t.Array(t.Object({ id: t.String() })),
-        }),
-      }),
+      app.get(
+        "/users",
+        {
+          response: t.Object({
+            users: t.Array(t.Object({ id: t.String() })),
+          }),
+        },
+        () => ({ users: [{ id: "1" }] }),
+      ),
     ),
   );
 
@@ -135,11 +147,6 @@ import { expectTypeOf } from "expect-type";
 {
   const app = new Elysia().get(
     "/orgs/:orgId/users/:userId",
-    ({ params }) => ({
-      orgId: params.orgId,
-      userId: params.userId,
-      name: "John",
-    }),
     {
       response: t.Object({
         orgId: t.String(),
@@ -147,6 +154,11 @@ import { expectTypeOf } from "expect-type";
         name: t.String(),
       }),
     },
+    ({ params }) => ({
+      orgId: params.orgId,
+      userId: params.userId,
+      name: "John",
+    }),
   );
 
   const eden = createEdenTQ<typeof app>("http://localhost:3000");
@@ -169,17 +181,17 @@ import { expectTypeOf } from "expect-type";
 {
   const app = new Elysia().get(
     "/might-fail",
-    () => {
-      if (Math.random() > 0.5) {
-        throw new Error("oops");
-      }
-      return { ok: true };
-    },
     {
       response: {
         200: t.Object({ ok: t.Boolean() }),
         500: t.Object({ error: t.String() }),
       },
+    },
+    () => {
+      if (Math.random() > 0.5) {
+        throw new Error("oops");
+      }
+      return { ok: true };
     },
   );
 
@@ -196,9 +208,13 @@ import { expectTypeOf } from "expect-type";
 // Test: QueryClient integration doesn't produce never
 // ============================================================================
 async function _testQueryClientIntegration() {
-  const app = new Elysia().get("/data", () => ({ value: 123 }), {
-    response: t.Object({ value: t.Number() }),
-  });
+  const app = new Elysia().get(
+    "/data",
+    {
+      response: t.Object({ value: t.Number() }),
+    },
+    () => ({ value: 123 }),
+  );
 
   const eden = createEdenTQ<typeof app>("http://localhost:3000");
   const queryClient = new QueryClient();
@@ -218,10 +234,6 @@ async function _testQueryClientIntegration() {
 {
   const app = new Elysia().post(
     "/create",
-    ({ body }) => ({
-      id: "1",
-      name: body.name,
-    }),
     {
       body: t.Object({ name: t.String() }),
       response: t.Object({
@@ -229,6 +241,10 @@ async function _testQueryClientIntegration() {
         name: t.String(),
       }),
     },
+    ({ body }) => ({
+      id: "1",
+      name: body.name,
+    }),
   );
 
   const eden = createEdenTQ<typeof app>("http://localhost:3000");
@@ -245,13 +261,21 @@ async function _testQueryClientIntegration() {
 // ============================================================================
 {
   const app = new Elysia()
-    .get("/hello", () => ({ ok: true }), {
-      response: t.Object({ ok: t.Boolean() }),
-    })
-    .post("/echo", ({ body }) => body, {
-      body: t.Object({ message: t.String() }),
-      response: t.Object({ message: t.String() }),
-    });
+    .get(
+      "/hello",
+      {
+        response: t.Object({ ok: t.Boolean() }),
+      },
+      () => ({ ok: true }),
+    )
+    .post(
+      "/echo",
+      {
+        body: t.Object({ message: t.String() }),
+        response: t.Object({ message: t.String() }),
+      },
+      ({ body }) => body,
+    );
 
   const eden = createEdenTQ<typeof app>("http://localhost:3000");
   const queryClient = new QueryClient();

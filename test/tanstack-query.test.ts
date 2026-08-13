@@ -6,23 +6,35 @@ const app = new Elysia()
   .get("/", () => "hello")
   .get("/header-echo", ({ headers }) => headers["x-test"] ?? null)
   .get("/user/:id", ({ params }) => ({ id: params.id, name: "John" }))
-  .post("/user", ({ body }) => ({ id: "1", ...body }), {
-    body: t.Object({
-      name: t.String(),
-      email: t.String(),
-    }),
-  })
-  .put("/user/:id", ({ params, body }) => ({ id: params.id, ...body }), {
-    body: t.Object({
-      name: t.String(),
-    }),
-  })
+  .post(
+    "/user",
+    {
+      body: t.Object({
+        name: t.String(),
+        email: t.String(),
+      }),
+    },
+    ({ body }) => ({ id: "1", ...body }),
+  )
+  .put(
+    "/user/:id",
+    {
+      body: t.Object({
+        name: t.String(),
+      }),
+    },
+    ({ params, body }) => ({ id: params.id, ...body }),
+  )
   .delete("/user/:id", ({ params }) => ({ deleted: params.id }))
-  .get("/posts", ({ query }) => ({ posts: [], filter: query.filter }), {
-    query: t.Object({
-      filter: t.Optional(t.String()),
-    }),
-  });
+  .get(
+    "/posts",
+    {
+      query: t.Object({
+        filter: t.Optional(t.String()),
+      }),
+    },
+    ({ query }) => ({ posts: [], filter: query.filter }),
+  );
 
 describe("createEdenTQ", () => {
   const eden = createEdenTQ<typeof app>(app);

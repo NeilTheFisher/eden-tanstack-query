@@ -12,25 +12,18 @@ const posts = Array.from({ length: 50 }, (_, i) => ({
 const app = new Elysia()
   .get("/", () => "hello")
   .get("/user/:id", ({ params }) => ({ id: params.id, name: "John" }))
-  .post("/user", ({ body }) => ({ id: "1", ...body }), {
-    body: t.Object({
-      name: t.String(),
-      email: t.String(),
-    }),
-  })
+  .post(
+    "/user",
+    {
+      body: t.Object({
+        name: t.String(),
+        email: t.String(),
+      }),
+    },
+    ({ body }) => ({ id: "1", ...body }),
+  )
   .get(
     "/posts",
-    ({ query }) => {
-      const cursor = query.cursor ? parseInt(query.cursor) : 0;
-      const limit = query.limit ? parseInt(query.limit) : 10;
-      const slice = posts.slice(cursor, cursor + limit);
-      const nextCursor = cursor + limit < posts.length ? cursor + limit : null;
-
-      return {
-        items: slice,
-        nextCursor,
-      };
-    },
     {
       query: t.Object({
         cursor: t.Optional(t.String()),
@@ -47,9 +40,25 @@ const app = new Elysia()
         nextCursor: t.Nullable(t.Number()),
       }),
     },
+    ({ query }) => {
+      const cursor = query.cursor ? parseInt(query.cursor) : 0;
+      const limit = query.limit ? parseInt(query.limit) : 10;
+      const slice = posts.slice(cursor, cursor + limit);
+      const nextCursor = cursor + limit < posts.length ? cursor + limit : null;
+
+      return {
+        items: slice,
+        nextCursor,
+      };
+    },
   )
   .get(
     "/comments",
+    {
+      query: t.Object({
+        page: t.Optional(t.String()),
+      }),
+    },
     ({ query }) => {
       const page = query.page ? parseInt(query.page) : 1;
       return {
@@ -57,11 +66,6 @@ const app = new Elysia()
         page,
         hasMore: page < 5,
       };
-    },
-    {
-      query: t.Object({
-        page: t.Optional(t.String()),
-      }),
     },
   );
 

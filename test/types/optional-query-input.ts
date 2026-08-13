@@ -5,12 +5,6 @@ import { createEdenTQ } from "../../src";
 const app = new Elysia()
   .get(
     "/contacts/:id/communications",
-    ({ params, query }) => ({
-      id: params.id,
-      items: [] as string[],
-      limit: query.limit ?? null,
-      offset: query.offset ?? null,
-    }),
     {
       query: t.Object({
         limit: t.Optional(t.Number()),
@@ -23,13 +17,15 @@ const app = new Elysia()
         offset: t.Nullable(t.Number()),
       }),
     },
+    ({ params, query }) => ({
+      id: params.id,
+      items: [] as string[],
+      limit: query.limit ?? null,
+      offset: query.offset ?? null,
+    }),
   )
   .get(
     "/search",
-    ({ query }) => ({
-      q: query.q,
-      limit: query.limit ?? null,
-    }),
     {
       query: t.Object({
         q: t.String(),
@@ -40,6 +36,10 @@ const app = new Elysia()
         limit: t.Nullable(t.Number()),
       }),
     },
+    ({ query }) => ({
+      q: query.q,
+      limit: query.limit ?? null,
+    }),
   );
 
 const eden = createEdenTQ<typeof app>("http://localhost:3000");

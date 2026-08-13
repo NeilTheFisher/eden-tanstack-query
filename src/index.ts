@@ -4,7 +4,7 @@ import type {
   QueryFunctionContext,
   QueryFunction,
 } from "@tanstack/query-core";
-import { treaty } from "@elysiajs/eden/treaty2";
+import { treaty } from "@elysia/eden/treaty2";
 import { streamedQuery } from "./streamedQuery";
 import type {
   EdenAppLike,

@@ -30,6 +30,11 @@ const app = new Elysia().group("/cases/:id", (app) =>
   app
     .get(
       "/share-links",
+      {
+        response: t.Object({
+          data: t.Array(ShareLinkSchema),
+        }),
+      },
       ({ params }) => ({
         data: [
           {
@@ -42,14 +47,16 @@ const app = new Elysia().group("/cases/:id", (app) =>
           },
         ],
       }),
-      {
-        response: t.Object({
-          data: t.Array(ShareLinkSchema),
-        }),
-      },
     )
     .post(
       "/share-link",
+      {
+        body: t.Object({
+          contactId: t.Optional(t.String()),
+          expiresInDays: t.Optional(t.Union([t.Literal(1), t.Literal(7), t.Literal(30)])),
+        }),
+        response: ShareLinkSchema,
+      },
       ({ params, body }) => ({
         id: "new-link-id",
         url: `https://share.example.com/${params.id}/xyz`,
@@ -58,31 +65,30 @@ const app = new Elysia().group("/cases/:id", (app) =>
         expiresInDays: body.expiresInDays ?? 7,
         contact: body.contactId ? { id: body.contactId, email: null, name: "Contact" } : null,
       }),
-      {
-        body: t.Object({
-          contactId: t.Optional(t.String()),
-          expiresInDays: t.Optional(t.Union([t.Literal(1), t.Literal(7), t.Literal(30)])),
-        }),
-        response: ShareLinkSchema,
-      },
     )
     .group("/share-links/:linkId", (app) =>
       app.delete(
         "/",
-        ({ params }) => ({
-          success: true,
-          deleted: { id: params.linkId },
-        }),
         {
           response: t.Object({
             success: t.Boolean(),
             deleted: t.Object({ id: t.String() }),
           }),
         },
+        ({ params }) => ({
+          success: true,
+          deleted: { id: params.linkId },
+        }),
       ),
     )
     .get(
       "/market-effort",
+      {
+        response: t.Object({
+          caseId: t.String(),
+          markets: t.Array(MarketEffortEntrySchema),
+        }),
+      },
       ({ params }) => ({
         caseId: params.id,
         markets: [
@@ -100,19 +106,9 @@ const app = new Elysia().group("/cases/:id", (app) =>
           },
         ],
       }),
-      {
-        response: t.Object({
-          caseId: t.String(),
-          markets: t.Array(MarketEffortEntrySchema),
-        }),
-      },
     )
     .patch(
       "/market-effort",
-      ({ params, body }) => ({
-        caseId: params.id,
-        markets: body.markets,
-      }),
       {
         body: t.Object({
           markets: t.Array(MarketEffortEntrySchema),
@@ -122,6 +118,10 @@ const app = new Elysia().group("/cases/:id", (app) =>
           markets: t.Array(MarketEffortEntrySchema),
         }),
       },
+      ({ params, body }) => ({
+        caseId: params.id,
+        markets: body.markets,
+      }),
     ),
 );
 

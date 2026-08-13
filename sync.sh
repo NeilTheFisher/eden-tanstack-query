@@ -9,7 +9,7 @@ cp "$EDEN_SRC/index.ts" "$PKG_SRC/index.ts"
 cp "$EDEN_SRC/types.ts" "$PKG_SRC/types.ts"
 
 # Fix imports for standalone package
-sed -i '' "s|from '../treaty2'|from '@elysiajs/eden/treaty2'|g" "$PKG_SRC/index.ts"
+sed -i '' "s|from '../treaty2'|from '@elysia/eden/treaty2'|g" "$PKG_SRC/index.ts"
 sed -i '' "s|from '../types'|// types inlined|g" "$PKG_SRC/types.ts"
 sed -i '' "s|from '../treaty2/types'|from '@elysiajs/eden/treaty2'|g" "$PKG_SRC/types.ts"
 
